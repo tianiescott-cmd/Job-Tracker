@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -14,6 +14,8 @@ export const STATUSES = [
 
 export const INTEREST_LEVELS = ["High", "Medium", "Low"] as const;
 
+export const MAX_SALARY = 10_000_000;
+
 export const prospects = pgTable("prospects", {
   id: serial("id").primaryKey(),
   companyName: text("company_name").notNull(),
@@ -21,6 +23,7 @@ export const prospects = pgTable("prospects", {
   jobUrl: text("job_url"),
   status: text("status").notNull().default("Bookmarked"),
   interestLevel: text("interest_level").notNull().default("Medium"),
+  salary: integer("salary"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -33,6 +36,7 @@ export const insertProspectSchema = createInsertSchema(prospects).omit({
   roleTitle: z.string().min(1, "Role title is required"),
   status: z.enum(STATUSES).default("Bookmarked"),
   interestLevel: z.enum(INTEREST_LEVELS).default("Medium"),
+  salary: z.number().int("Salary must be a whole number").min(0, "Salary cannot be negative").max(MAX_SALARY, `Salary cannot exceed ${MAX_SALARY.toLocaleString()}`).optional().nullable(),
   jobUrl: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
