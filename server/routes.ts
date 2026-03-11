@@ -40,6 +40,22 @@ export async function registerRoutes(
     if (body.jobUrl !== undefined) updates.jobUrl = body.jobUrl;
     if (body.notes !== undefined) updates.notes = body.notes;
 
+    if (body.deadline !== undefined) {
+      if (body.deadline === null) {
+        updates.deadline = null;
+      } else {
+        const dlValid = typeof body.deadline === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.deadline) && (() => {
+          const [y, m, d] = body.deadline.split("-").map(Number);
+          const dt = new Date(Date.UTC(y, m - 1, d));
+          return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+        })();
+        if (!dlValid) {
+          return res.status(400).json({ message: "Deadline must be a valid date (YYYY-MM-DD)" });
+        }
+        updates.deadline = body.deadline;
+      }
+    }
+
     if (body.salary !== undefined) {
       if (body.salary === null) {
         updates.salary = null;
