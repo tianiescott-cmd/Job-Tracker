@@ -39,6 +39,34 @@ export function validateProspect(data: Record<string, unknown>): { valid: boolea
     }
   }
 
+  if (data.interviewDate !== undefined && data.interviewDate !== null) {
+    if (typeof data.interviewDate !== "string") {
+      errors.push("Interview date must be a valid date string");
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(data.interviewDate)) {
+      errors.push("Interview date must be in YYYY-MM-DD format");
+    } else {
+      const [y, m, d] = data.interviewDate.split("-").map(Number);
+      const dt = new Date(Date.UTC(y, m - 1, d));
+      if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) {
+        errors.push("Interview date must be a valid date");
+      }
+    }
+  }
+
+  if (data.deadline !== undefined && data.deadline !== null) {
+    if (typeof data.deadline !== "string") {
+      errors.push("Deadline must be a valid date string");
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(data.deadline)) {
+      errors.push("Deadline must be in YYYY-MM-DD format");
+    } else {
+      const [y, m, d] = data.deadline.split("-").map(Number);
+      const dt = new Date(Date.UTC(y, m - 1, d));
+      if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) {
+        errors.push("Deadline must be a valid date");
+      }
+    }
+  }
+
   if (data.salary !== undefined && data.salary !== null) {
     if (typeof data.salary !== "number" || !Number.isInteger(data.salary)) {
       errors.push("Salary must be a whole number");

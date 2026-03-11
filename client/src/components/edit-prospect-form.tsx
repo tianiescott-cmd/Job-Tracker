@@ -42,6 +42,8 @@ export function EditProspectForm({ prospect, onSuccess }: EditProspectFormProps)
       status: prospect.status as InsertProspect["status"],
       interestLevel: prospect.interestLevel as InsertProspect["interestLevel"],
       salary: prospect.salary ?? undefined,
+      deadline: prospect.deadline ?? "",
+      interviewDate: prospect.interviewDate ?? "",
       notes: prospect.notes ?? "",
     },
   });
@@ -179,6 +181,52 @@ export function EditProspectForm({ prospect, onSuccess }: EditProspectFormProps)
                     field.onChange(val === "" ? null : parseInt(val, 10));
                   }}
                   data-testid="input-edit-salary"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="deadline"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Application Deadline (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    field.onChange(val === "" ? null : val);
+                  }}
+                  data-testid="input-edit-deadline"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="interviewDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Interview Date (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    field.onChange(val === "" ? null : val);
+                  }}
+                  data-testid="input-edit-interview-date"
                 />
               </FormControl>
               <FormMessage />
