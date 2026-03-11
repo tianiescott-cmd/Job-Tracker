@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProspectSchema, STATUSES, INTEREST_LEVELS } from "@shared/schema";
+import { insertProspectSchema, STATUSES, INTEREST_LEVELS, MAX_SALARY } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -39,6 +39,18 @@ export async function registerRoutes(
     if (body.roleTitle !== undefined) updates.roleTitle = body.roleTitle;
     if (body.jobUrl !== undefined) updates.jobUrl = body.jobUrl;
     if (body.notes !== undefined) updates.notes = body.notes;
+
+    if (body.salary !== undefined) {
+      if (body.salary === null) {
+        updates.salary = null;
+      } else {
+        const s = body.salary;
+        if (typeof s !== "number" || !Number.isInteger(s) || s < 0 || s > MAX_SALARY) {
+          return res.status(400).json({ message: `Salary must be a whole number between 0 and ${MAX_SALARY.toLocaleString()}` });
+        }
+        updates.salary = s;
+      }
+    }
 
     if (body.status !== undefined) {
       if (!STATUSES.includes(body.status)) {

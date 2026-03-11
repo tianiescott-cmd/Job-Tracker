@@ -1,4 +1,4 @@
-import { STATUSES, INTEREST_LEVELS } from "@shared/schema";
+import { STATUSES, INTEREST_LEVELS, MAX_SALARY } from "@shared/schema";
 
 export function getNextStatus(currentStatus: string): string {
   const terminalStatuses = ["Offer", "Rejected", "Withdrawn"];
@@ -36,6 +36,16 @@ export function validateProspect(data: Record<string, unknown>): { valid: boolea
   if (data.interestLevel !== undefined) {
     if (!INTEREST_LEVELS.includes(data.interestLevel as (typeof INTEREST_LEVELS)[number])) {
       errors.push(`Interest level must be one of: ${INTEREST_LEVELS.join(", ")}`);
+    }
+  }
+
+  if (data.salary !== undefined && data.salary !== null) {
+    if (typeof data.salary !== "number" || !Number.isInteger(data.salary)) {
+      errors.push("Salary must be a whole number");
+    } else if (data.salary < 0) {
+      errors.push("Salary cannot be negative");
+    } else if (data.salary > MAX_SALARY) {
+      errors.push(`Salary cannot exceed ${MAX_SALARY.toLocaleString()}`);
     }
   }
 
