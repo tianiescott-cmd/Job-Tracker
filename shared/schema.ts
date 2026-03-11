@@ -25,6 +25,7 @@ export const prospects = pgTable("prospects", {
   interestLevel: text("interest_level").notNull().default("Medium"),
   salary: integer("salary"),
   deadline: text("deadline"),
+  interviewDate: text("interview_date"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -47,6 +48,14 @@ export const insertProspectSchema = createInsertSchema(prospects).omit({
       const date = new Date(Date.UTC(y, m - 1, d));
       return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
     }, "Deadline must be a valid date").optional().nullable(),
+  ),
+  interviewDate: z.preprocess(
+    (val) => (val === "" ? null : val),
+    z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Interview date must be a valid date (YYYY-MM-DD)").refine((val) => {
+      const [y, m, d] = val.split("-").map(Number);
+      const date = new Date(Date.UTC(y, m - 1, d));
+      return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+    }, "Interview date must be a valid date").optional().nullable(),
   ),
   jobUrl: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),

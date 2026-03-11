@@ -232,3 +232,111 @@ describe("deadline validation", () => {
     expect(result.errors).toHaveLength(0);
   });
 });
+
+describe("interview date validation", () => {
+  test("accepts a valid interview date", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "2025-08-15",
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  test("accepts a prospect without an interview date", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  test("accepts null interview date (cleared)", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: null,
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  test("rejects an interview date with wrong format", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "08/15/2025",
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain("Interview date must be in YYYY-MM-DD format");
+  });
+
+  test("rejects a non-string interview date", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: 20250815 as unknown,
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain("Interview date must be a valid date string");
+  });
+
+  test("rejects an invalid calendar interview date", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "2025-02-29",
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain("Interview date must be a valid date");
+  });
+
+  test("accepts a past interview date", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "2024-01-10",
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  test("allows a prospect with interview date, deadline, and salary together", () => {
+    const result = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      salary: 200000,
+      deadline: "2025-07-01",
+      interviewDate: "2025-07-15",
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  test("allows editing interview date to a new valid date", () => {
+    const original = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "2025-08-01",
+    });
+    expect(original.valid).toBe(true);
+
+    const updated = validateProspect({
+      companyName: "Google",
+      roleTitle: "Software Engineer",
+      interviewDate: "2025-09-15",
+    });
+    expect(updated.valid).toBe(true);
+    expect(updated.errors).toHaveLength(0);
+  });
+});
